@@ -18,11 +18,23 @@ jobs:
         echo "${{ secrets.KEYSTORE_FILE }}" > myapp.keystore.asc
         gpg -d --passphrase "${{ secrets.KEYSTORE_PASSWORD_GPG }}" --batch myapp.keystore.asc > myapp.keystore
     - name: Setup .NET
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v2
       with:
         dotnet-version: 6.0.x
-    - name: Install .NET MAUI
-      run: dotnet workload install maui
+    #- name: Install .NET MAUI
+    #  run: dotnet workload install maui
+    
+    - name: Install .NET MAUI & JDK 11
+      shell: pwsh
+      run: |
+        dotnet workload install maui --source https://aka.ms/dotnet6/nuget/index.json --source https://api.nuget.org/v3/index.json
+        dotnet workload install android maui wasm-tools --source https://aka.ms/dotnet6/nuget/index.json --source https://api.nuget.org/v3/index.json  
+    - uses: actions/setup-java@v2
+      with:
+        distribution: 'microsoft'
+        java-version: '11'
+
+      
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
